@@ -241,7 +241,7 @@ class _CropGridViewerState extends State<CropGridViewer> with CropPreviewMixin {
     }
   }
 
-  void _onPanEnd({bool force = false}) {
+  void _onPanEnd({bool force = false, bool enableCallback = false}) {
     if (_boundary != CropBoundaries.none || force) {
       final Rect r = rect.value;
       _controller.cacheMinCrop = Offset(
@@ -255,7 +255,7 @@ class _CropGridViewerState extends State<CropGridViewer> with CropPreviewMixin {
       _controller.isCropping = false;
       // to update selected boundary color
       setState(() => _boundary = CropBoundaries.none);
-      if (widget.onPanEnd != null) {
+      if (widget.onPanEnd != null && enableCallback) {
         widget.onPanEnd!(_controller.cacheMinCrop, _controller.cacheMaxCrop);
       }
     }
@@ -353,7 +353,7 @@ class _CropGridViewerState extends State<CropGridViewer> with CropPreviewMixin {
           child: GestureDetector(
             onPanDown: _onPanDown,
             onPanUpdate: _onPanUpdate,
-            onPanEnd: (_) => _onPanEnd(),
+            onPanEnd: (_) => _onPanEnd(enableCallback: true),
             onTapUp: (_) => _onPanEnd(),
             child: const SizedBox.expand(
               child: DecoratedBox(
