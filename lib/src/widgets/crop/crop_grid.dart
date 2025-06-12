@@ -25,6 +25,7 @@ class CropGridViewer extends StatefulWidget {
   const CropGridViewer.preview({
     super.key,
     required this.controller,
+    this.onPanEnd,
   })  : showGrid = false,
         rotateCropArea = true,
         margin = EdgeInsets.zero;
@@ -34,6 +35,7 @@ class CropGridViewer extends StatefulWidget {
     required this.controller,
     this.margin = const EdgeInsets.symmetric(horizontal: 20),
     this.rotateCropArea = true,
+    this.onPanEnd,
   }) : showGrid = true;
 
   /// The [controller] param is mandatory so every change in the controller settings will propagate in the crop view
@@ -53,6 +55,9 @@ class CropGridViewer extends StatefulWidget {
   ///
   /// Defaults to `true` (like iOS Photos app crop)
   final bool rotateCropArea;
+
+  /// Expose pan end
+  final Function(Offset, Offset)? onPanEnd;
 
   @override
   State<CropGridViewer> createState() => _CropGridViewerState();
@@ -250,6 +255,9 @@ class _CropGridViewerState extends State<CropGridViewer> with CropPreviewMixin {
       _controller.isCropping = false;
       // to update selected boundary color
       setState(() => _boundary = CropBoundaries.none);
+      if (widget.onPanEnd != null) {
+        widget.onPanEnd!(_controller.cacheMinCrop, _controller.cacheMaxCrop);
+      }
     }
   }
 
