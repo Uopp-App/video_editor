@@ -1,3 +1,6 @@
+import 'dart:math';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:video_editor/src/models/crop_style.dart';
 import 'package:video_editor/src/widgets/crop/crop_grid.dart';
@@ -72,6 +75,35 @@ class CropGridPainter extends CustomPainter {
     }
   }
 
+  void drawDashedBox(
+        {required Canvas canvas,
+        required int dashWidth,
+        required int dashSpace,
+        required Paint paint}) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke // Important for drawing lines/borders
+      ..strokeCap = StrokeCap.butt; // How line ends are drawn
+
+    // Path for the square
+    final path = Path()
+      ..addRRect(RRect.fromRectAndRadius(rect, const Radius.circular(5)));
+
+    // Get the metrics of the path to iterate over its segments
+    for (ui.PathMetric metric in path.computeMetrics()) {
+      double distance = 0.0;
+      while (distance < metric.length) {
+        // Draw a segment
+        final extractPath = metric.extractPath(distance, distance + dashWidth);
+        canvas.drawPath(extractPath, paint);
+
+        // Move to the next dash start point, skipping the dashSpace
+        distance += dashWidth + dashSpace;
+      }
+    }
+  }
+
   Paint getPaintFromBoundary(CropBoundaries offset) {
     return Paint()
       ..color = (boundary == CropBoundaries.inside || offset == boundary)
@@ -83,72 +115,8 @@ class CropGridPainter extends CustomPainter {
     final double width = style.boundariesWidth;
     final double length = style.boundariesLength;
 
-    //----//
-    //EDGE//
-    //----//
-    // TOP LEFT |-
-    canvas.drawRect(
-      Rect.fromPoints(
-        rect.topLeft,
-        rect.topLeft + Offset(width, length),
-      ),
-      getPaintFromBoundary(CropBoundaries.topLeft),
-    );
-    canvas.drawRect(
-      Rect.fromPoints(
-        rect.topLeft,
-        rect.topLeft + Offset(length, width),
-      ),
-      getPaintFromBoundary(CropBoundaries.topLeft),
-    );
-
-    // TOP RIGHT -|
-    canvas.drawRect(
-      Rect.fromPoints(
-        rect.topRight - Offset(length, 0.0),
-        rect.topRight + Offset(0.0, width),
-      ),
-      getPaintFromBoundary(CropBoundaries.topRight),
-    );
-    canvas.drawRect(
-      Rect.fromPoints(
-        rect.topRight,
-        rect.topRight - Offset(width, -length),
-      ),
-      getPaintFromBoundary(CropBoundaries.topRight),
-    );
-
-    // BOTTOM RIGHT _|
-    canvas.drawRect(
-      Rect.fromPoints(
-        rect.bottomRight - Offset(width, length),
-        rect.bottomRight,
-      ),
-      getPaintFromBoundary(CropBoundaries.bottomRight),
-    );
-    canvas.drawRect(
-      Rect.fromPoints(
-        rect.bottomRight,
-        rect.bottomRight - Offset(length, width),
-      ),
-      getPaintFromBoundary(CropBoundaries.bottomRight),
-    );
-
-    // BOTTOM LEFT |_
-    canvas.drawRect(
-      Rect.fromPoints(
-        rect.bottomLeft - Offset(-width, length),
-        rect.bottomLeft,
-      ),
-      getPaintFromBoundary(CropBoundaries.bottomLeft),
-    );
-    canvas.drawRect(
-      Rect.fromPoints(
-        rect.bottomLeft,
-        rect.bottomLeft + Offset(length, -width),
-      ),
-      getPaintFromBoundary(CropBoundaries.bottomLeft),
-    );
+    // Dashed Box //
+    drawDashedBox(canvas: canvas, dashWidth: 8, dashSpace: 8, paint: Paint()..color = Colors.white..strokeWidth = 2);
 
     //------//
     //CENTER//

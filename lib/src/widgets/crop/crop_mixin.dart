@@ -55,7 +55,6 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
     TransformData transform,
     CropBoundaries boundary, {
     bool showGrid = false,
-    Widget? child,
   }) {
     return SizedBox.fromSize(
       size: layout,
@@ -69,7 +68,6 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
             boundary: boundary,
             showGrid: showGrid,
             showCenterRects: controller.preferredCropAspectRatio == null,
-            child: child
           ),
         ),
       ),
@@ -103,13 +101,12 @@ mixin CropPreviewMixin<T extends StatefulWidget> on State<T> {
     CropBoundaries? boundary,
     bool showGrid = false,
     bool showCenterRects = false,
-    Widget? child,
   }) {
     return ValueListenableBuilder(
       valueListenable: rect,
 
       /// Build a [Widget] that hides the cropped area and show the crop grid if widget.showGris is true
-      builder: (_, Rect value, __) => child ?? RepaintBoundary(
+      builder: (_, Rect value, __) => RepaintBoundary(
         child: CustomPaint(
           size: Size.infinite,
           painter: CropGridPainter(
