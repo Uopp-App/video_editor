@@ -25,6 +25,7 @@ class CropGridViewer extends StatefulWidget {
   const CropGridViewer.preview({
     super.key,
     required this.controller,
+    this.child,
     this.onPanEnd,
   })  : showGrid = false,
         rotateCropArea = true,
@@ -35,6 +36,7 @@ class CropGridViewer extends StatefulWidget {
     required this.controller,
     this.margin = const EdgeInsets.symmetric(horizontal: 20),
     this.rotateCropArea = true,
+    this.child,
     this.onPanEnd,
   }) : showGrid = true;
 
@@ -58,6 +60,9 @@ class CropGridViewer extends StatefulWidget {
 
   /// Expose pan end
   final Function(Offset, Offset)? onPanEnd;
+
+  /// Child that replaces the custom grid painter with our own widget
+  final Widget? child;
 
   @override
   State<CropGridViewer> createState() => _CropGridViewerState();
@@ -378,6 +383,7 @@ class _CropGridViewerState extends State<CropGridViewer> with CropPreviewMixin {
         transform,
         _boundary,
         showGrid: widget.showGrid,
+        child: widget.child
       ),
     );
   }
